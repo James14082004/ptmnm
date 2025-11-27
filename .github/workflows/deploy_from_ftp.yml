@@ -1,0 +1,25 @@
+---
+- name: Deploy from FTP server to remote server
+  hosts: remote_servers
+  gather_facts: no
+  tasks:
+    - name: Install FTP client
+      apt:
+        name: ftp
+        state: present
+      become: yes
+
+    - name: Fetch files from FTP server
+      get_url:
+        url: "ftp://{{ ftp_server }}/{{ ftp_path }}"
+        dest: "/path/to/destination/folder"
+        force: yes
+        url_password: "{{ ftp_password }}"
+        url_username: "{{ ftp_user }}"
+      delegate_to: localhost
+
+    - name: Set proper file permissions
+      file:
+        path: "/path/to/destination/folder"
+        mode: '0755'
+        recurse: yes
